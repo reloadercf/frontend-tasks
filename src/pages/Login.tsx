@@ -48,13 +48,13 @@ export const Login = () => {
       <nav className="lg:flex lg:justify-around">
         <Link
           className="block text-center my-5 text-indigo-600 uppercase text-sm"
-          to="register"
+          to="/register"
         >
           Create account now!
         </Link>
         <Link
           className="block text-center my-5 text-indigo-600 uppercase text-sm"
-          to="forget-password"
+          to="/forget-password"
         >
           Forgot your password?
         </Link>

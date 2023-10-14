@@ -5,7 +5,7 @@ export const Register = () => {
   return (
     <div>
       <h2 className="capitalize text-center text-indigo-600 font-bold text-2xl">
-        Create new accout
+        Create new account
       </h2>
       <form className="my-10 bg-white shadow px-10 py-5">
         <div className="my-5">
