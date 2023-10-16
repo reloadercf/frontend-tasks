@@ -1,13 +1,51 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SchemaRegister } from './SchemaRegister';
 
 export const Register = () => {
+  const [formData, setFormData] = useState({
+    nameUser: '',
+    email: '',
+    password: '',
+    repeatPassword: '',
+  });
+  const [errorForm, setError] = useState({});
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (errorForm.hasOwnProperty(name)) {
+      const errorFound= { ...errorForm };
+      delete errorFound[name];
+      setError(errorFound);
+    }
+
+    setFormData((preData) => ({
+      ...preData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const isValid = SchemaRegister.safeParse(formData);
+    if (isValid.success) {
+      console.log('all ok');
+    } else {
+      isValid.error.issues.forEach((err) => {
+        setError((prev) => ({ ...prev, [err.path]: err.message }));
+      });
+    }
+  };
+
   return (
     <div>
       <h2 className="capitalize text-center text-indigo-600 font-bold text-2xl">
         Create new account
       </h2>
-      <form className="my-10 bg-white shadow px-10 py-5">
+      <form
+        className="my-10 bg-white shadow px-10 py-5"
+        onSubmit={handleSubmit}
+      >
         <div className="my-5">
           <label
             className="uppercase text-gray-600 block text-lg font-bold"
@@ -20,7 +58,13 @@ export const Register = () => {
             placeholder="What is your name?"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
             id="name"
+            name="nameUser"
+            value={formData.nameUser}
+            onChange={handleInputChange}
           />
+          {errorForm.nameUser && (
+            <span className="text-rose-600">{errorForm.nameUser}</span>
+          )}
         </div>
         <div className="my-5">
           <label
@@ -31,10 +75,16 @@ export const Register = () => {
           </label>
           <input
             type="email"
+            name="email"
             placeholder="Input your email"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
             id="email"
+            value={formData.email}
+            onChange={handleInputChange}
           />
+          {errorForm.email && (
+            <span className="text-rose-600">{errorForm.email}</span>
+          )}
         </div>
         <div className="my-5">
           <label
@@ -45,10 +95,16 @@ export const Register = () => {
           </label>
           <input
             type="password"
+            name="password"
             placeholder="password"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-            id="email"
+            id="password"
+            value={formData.password}
+            onChange={handleInputChange}
           />
+          {errorForm.password && (
+            <span className="text-rose-600">{errorForm.password}</span>
+          )}
         </div>
         <div className="my-5">
           <label
@@ -59,10 +115,16 @@ export const Register = () => {
           </label>
           <input
             type="password"
+            name="repeatPassword"
             placeholder="repeat your password"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
             id="repeatPassword"
+            value={formData.repeatPassword}
+            onChange={handleInputChange}
           />
+          {errorForm.repeatPassword && (
+            <span className="text-rose-600">{errorForm.repeatPassword}</span>
+          )}
         </div>
         <input
           type="submit"
