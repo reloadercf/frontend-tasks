@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const SchemaRegister = z
   .object({
-    nameUser: z.string().trim().min(2, { message: 'Complete your name' }),
+    name: z.string().trim().min(2, { message: 'Complete your name' }),
     email: z.coerce
       .string()
       .email({ message: 'email invalid' })

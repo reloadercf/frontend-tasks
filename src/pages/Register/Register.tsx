@@ -1,20 +1,29 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
 import { SchemaRegister } from './SchemaRegister';
+import Input from '../../components/Input';
+import Alert from '../../components/Alert';
 
 export const Register = () => {
   const [formData, setFormData] = useState({
-    nameUser: '',
+    name: '',
     email: '',
     password: '',
     repeatPassword: '',
   });
   const [errorForm, setError] = useState({});
 
+  const [notification, setNotification] = useState({
+    message: null,
+    kind: null,
+  });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (errorForm.hasOwnProperty(name)) {
-      const errorFound= { ...errorForm };
+      const errorFound = { ...errorForm };
       delete errorFound[name];
       setError(errorFound);
     }
@@ -25,11 +34,29 @@ export const Register = () => {
     }));
   };
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const isValid = SchemaRegister.safeParse(formData);
     if (isValid.success) {
       console.log('all ok');
+      try {
+        const { data } = await axios.post(
+          'https://backend-tasks.onrender.com/api/users',
+          formData
+        );
+
+        setNotification({
+          message: data.msj,
+          kind: 'success',
+        });
+        console.log(data);
+        
+      } catch (err) {
+        setNotification({
+          message: err.message,
+          kind: 'error',
+        });
+      }
     } else {
       isValid.error.issues.forEach((err) => {
         setError((prev) => ({ ...prev, [err.path]: err.message }));
@@ -42,90 +69,53 @@ export const Register = () => {
       <h2 className="capitalize text-center text-indigo-600 font-bold text-2xl">
         Create new account
       </h2>
+      {notification.message && (
+        <Alert
+          message={notification.message}
+          kind={notification.kind}
+          setNotification={setNotification}
+        />
+      )}
       <form
         className="my-10 bg-white shadow px-10 py-5"
         onSubmit={handleSubmit}
       >
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="name"
-          >
-            Name:
-          </label>
-          <input
-            type="text"
-            placeholder="What is your name?"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-            id="name"
-            name="nameUser"
-            value={formData.nameUser}
-            onChange={handleInputChange}
-          />
-          {errorForm.nameUser && (
-            <span className="text-rose-600">{errorForm.nameUser}</span>
-          )}
-        </div>
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="email"
-          >
-            Email:
-          </label>
-          <input
-            type="email"
-            name="email"
-            placeholder="Input your email"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-            id="email"
-            value={formData.email}
-            onChange={handleInputChange}
-          />
-          {errorForm.email && (
-            <span className="text-rose-600">{errorForm.email}</span>
-          )}
-        </div>
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="password"
-          >
-            Password:
-          </label>
-          <input
-            type="password"
-            name="password"
-            placeholder="password"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-            id="password"
-            value={formData.password}
-            onChange={handleInputChange}
-          />
-          {errorForm.password && (
-            <span className="text-rose-600">{errorForm.password}</span>
-          )}
-        </div>
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="repeatPassword"
-          >
-            Confirm password:
-          </label>
-          <input
-            type="password"
-            name="repeatPassword"
-            placeholder="repeat your password"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-            id="repeatPassword"
-            value={formData.repeatPassword}
-            onChange={handleInputChange}
-          />
-          {errorForm.repeatPassword && (
-            <span className="text-rose-600">{errorForm.repeatPassword}</span>
-          )}
-        </div>
+        <Input
+          id="name"
+          kind="text"
+          title="name"
+          value={formData.name}
+          placeholder="What is your name?"
+          onInput={handleInputChange}
+          error={errorForm.name}
+        />
+        <Input
+          id="email"
+          kind="email"
+          title="email"
+          value={formData.email}
+          placeholder="Write your email"
+          onInput={handleInputChange}
+          error={errorForm.email}
+        />
+        <Input
+          id="password"
+          kind="password"
+          title="password"
+          value={formData.password}
+          placeholder="****"
+          onInput={handleInputChange}
+          error={errorForm.password}
+        />
+        <Input
+          id="repeatPassword"
+          kind="password"
+          title="repeat your password"
+          value={formData.repeatPassword}
+          placeholder="****"
+          onInput={handleInputChange}
+          error={errorForm.repeatPassword}
+        />
         <input
           type="submit"
           value="Register"

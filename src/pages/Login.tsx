@@ -35,7 +35,7 @@ export const Login = () => {
             type="password"
             placeholder="password"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-100"
-            id="email"
+            id="password"
           />
         </div>
         <input
