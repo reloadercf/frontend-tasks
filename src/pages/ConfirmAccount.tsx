@@ -1,19 +1,60 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+
+import Alert from '../components/Alert';
+
 export const ConfirmAccount = () => {
+  const [notification, setNotification] = useState({
+    message: null,
+    kind: null,
+  });
+
+  const { id } = useParams();
+  useEffect(() => {
+    const confirmAccount = async () => {
+      try {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/users/confirm/${id}`;
+        const { data } = await axios(url);
+        setNotification({
+          message: data.msj,
+          kind: 'success',
+        });
+      } catch (err) {
+        setNotification({
+          message: err.response.data.msj,
+          kind: 'error',
+        });
+      }
+    };
+    confirmAccount();
+  }, []);
   return (
     <div>
       <h2 className="capitalize text-center text-indigo-600 font-bold text-2xl">
         Confirm your account
       </h2>
-      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Neque animi
-      aliquid quod vitae qui illo magnam facere dignissimos doloremque ea alias
-      odit odio officiis iste perspiciatis ex, corrupti atque sint. Fugiat, vel
-      reprehenderit minus excepturi omnis quibusdam molestiae illo, distinctio
-      pariatur nam molestias ipsa perferendis asperiores laboriosam dolor
-      reiciendis dolore repellat et a facilis eos. Minus pariatur ad ducimus
-      saepe! Aut cupiditate culpa aperiam soluta maiores perferendis accusamus
-      voluptatibus, quam consequuntur esse sunt modi. Laborum culpa a
-      distinctio, earum aliquid cumque itaque corporis, ipsam voluptatibus vero,
-      maiores quos dolor libero.
+      {notification.message && (
+        <Alert
+          message={notification.message}
+          kind={notification.kind}
+          setNotification={setNotification}
+        />
+      )}
+      <nav className="lg:flex lg:justify-around">
+        <Link
+          className="block text-center my-5 text-indigo-800 uppercase text-sm"
+          to="/"
+        >
+          You have confirmed account? Go Login
+        </Link>
+        <Link
+          className="block text-center my-5 text-indigo-600 uppercase text-sm"
+          to="forget-password"
+        >
+          Forgot your password?
+        </Link>
+      </nav>
     </div>
   );
 };
