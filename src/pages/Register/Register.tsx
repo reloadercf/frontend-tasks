@@ -41,7 +41,7 @@ export const Register = () => {
       console.log('all ok');
       try {
         const { data } = await axios.post(
-          'https://backend-tasks.onrender.com/api/users',
+          `${import.meta.env.VITE_BACKEND_URL}/users`,
           formData
         );
 
@@ -49,11 +49,16 @@ export const Register = () => {
           message: data.msj,
           kind: 'success',
         });
-        console.log(data);
-        
+
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          repeatPassword: '',
+        });
       } catch (err) {
         setNotification({
-          message: err.message,
+          message: err.response.data.msj,
           kind: 'error',
         });
       }
