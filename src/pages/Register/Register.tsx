@@ -137,7 +137,7 @@ export const Register = () => {
         </Link>
         <Link
           className="block text-center my-5 text-indigo-600 uppercase text-sm"
-          to="forget-password"
+          to="/forget-password"
         >
           Forgot your password?
         </Link>
