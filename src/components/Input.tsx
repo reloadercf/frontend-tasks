@@ -7,7 +7,7 @@ interface PropsInputs {
   value: string;
   placeholder: string;
   onInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  error?: string;
+  error?: string | null;
 }
 const Input: React.FC<PropsInputs> = ({
   id,
