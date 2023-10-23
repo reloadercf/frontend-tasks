@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import connect from '../../lib/connectAxios';
 
 import { SchemaRegister } from './SchemaRegister';
 import Input from '../../components/Input';
@@ -40,10 +40,7 @@ export const Register = () => {
     if (isValid.success) {
       console.log('all ok');
       try {
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/users`,
-          formData
-        );
+        const { data } = await connect.user.post('/', formData);
 
         setNotification({
           message: data.msj,

@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-
+import connect from '../lib/connectAxios';
 import Alert from '../components/Alert';
 
 export const ConfirmAccount = () => {
@@ -14,8 +13,7 @@ export const ConfirmAccount = () => {
   useEffect(() => {
     const confirmAccount = async () => {
       try {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/users/confirm/${id}`;
-        const { data } = await axios(url);
+        const { data } = await connect.user(`/confirm/${id}`);
         setNotification({
           message: data.msj,
           kind: 'success',

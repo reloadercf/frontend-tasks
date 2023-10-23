@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import axios from 'axios';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import connect from '../lib/connectAxios';
 import Alert from '../components/Alert';
 import Input from '../components/Input';
 
@@ -25,10 +25,9 @@ export const ForgetPassword = () => {
     const isValidEmail = SchemaRecovery.safeParse(email);
     if (isValidEmail.success) {
       try {
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/users/forget-password/`,
-          { email }
-        );
+        const { data } = await connect.user.post('/forget-password/', {
+          email,
+        });
         setNotification({
           message: data.msj,
           kind: 'success',
