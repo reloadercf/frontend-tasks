@@ -1,12 +1,54 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
+import { z } from 'zod';
+import axios from 'axios';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import Alert from '../components/Alert';
+import Input from '../components/Input';
+
+export const SchemaRecovery = z.coerce
+  .string()
+  .email({ message: 'Email invalid' })
+  .min(5, { message: 'Complete your email' })
+  .toLowerCase();
+
 export const ForgetPassword = () => {
   const [email, setEmail] = useState('');
+  const [errorInput, setErrorInput] = useState(null);
+  const [notification, setNotification] = useState({
+    message: null,
+    kind: null,
+  });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    const isValidEmail = SchemaRecovery.safeParse(email);
+    if (isValidEmail.success) {
+      try {
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/users/forget-password/`,
+          { email }
+        );
+        setNotification({
+          message: data.msj,
+          kind: 'success',
+        });
+      } catch (err) {
+        const { response } = err;
+        setNotification({
+          message: response.data.msj,
+          kind: 'error',
+        });
+      }
+    } else {
+      setErrorInput(isValidEmail.error.issues[0].message);
+    }
+  };
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+    if (errorInput !== null) {
+      setErrorInput(null);
+    }
   };
 
   return (
@@ -14,28 +56,26 @@ export const ForgetPassword = () => {
       <h2 className="capitalize text-center text-indigo-600 font-bold text-2xl">
         Recovery your password
       </h2>
+      {notification.message && (
+        <Alert
+          message={notification.message}
+          kind={notification.kind}
+          setNotification={setNotification}
+        />
+      )}
       <form
         className="my-10 bg-white shadow px-10 py-5"
         onSubmit={handleSubmit}
       >
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="email"
-          >
-            Email:
-          </label>
-          <input
-            type="email"
-            placeholder="Input your email"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-            id="email"
-            value={email}
-            onChange={(e) => {
-              setEmail((data) => data + e.target.value);
-            }}
-          />
-        </div>
+        <Input
+          id="email"
+          kind="email"
+          title="Email"
+          value={email}
+          placeholder="Introduce your email for recovery password"
+          onInput={handleEmail}
+          error={errorInput}
+        />
         <input
           type="submit"
           value="Recovery password"
