@@ -18,7 +18,7 @@ const Alert: React.FC<AlertPops> = ({ message, kind, setNotification }) => {
         message: null,
         kind: null,
       });
-    }, 8000);
+    }, 10000);
   }, []);
 
   return (
