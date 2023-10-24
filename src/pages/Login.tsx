@@ -1,43 +1,92 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
+import { z } from 'zod';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import Alert from '../components/Alert';
+import Input from '../components/Input';
+import connect from '../lib/connectAxios';
+
+const loginSchema = z.object({
+  email: z.string().email().min(5, { message: 'Complete your email' }),
+  password: z.string().min(5, { message: 'Complete your password' }),
+});
+
 export const Login = () => {
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+  });
+  const [notification, setNotification] = useState({
+    message: null,
+    kind: null,
+  });
+  const [errorForm, setError] = useState({});
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (errorForm.hasOwnProperty(name)) {
+      const errorFound = { ...errorForm };
+      delete errorFound[name];
+      setError(errorFound);
+    }
+
+    setCredentials((preData) => ({
+      ...preData,
+      [name]: value,
+    }));
+  };
+  const handleLogin = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    const isValidForm = loginSchema.safeParse(credentials);
+    if (isValidForm.success) {
+      try {
+        const { data } = await connect.user.post('/login', credentials);
+        console.log(data);
+      } catch (err) {
+        setNotification({
+          message: err.response.data.msj,
+          kind: 'error',
+        });
+      }
+    } else {
+      isValidForm.error.issues.forEach((err) => {
+        setError((prev) => ({ ...prev, [err.path]: err.message }));
+      });
+    }
+  };
   return (
     <>
       <h1 className="text-indigo-600 font-black text-6xl capitalize">
         admin your
         <span className="text-slate-700"> projects</span>
       </h1>
-
-      <form className="my-10 bg-white shadow px-10 py-5">
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="email"
-          >
-            Email:
-          </label>
-          <input
-            type="email"
-            placeholder="input your email"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-100"
-            id="email"
-          />
-        </div>
-        <div className="my-5">
-          <label
-            className="uppercase text-gray-600 block text-lg font-bold"
-            htmlFor="password"
-          >
-            Password:
-          </label>
-          <input
-            type="password"
-            placeholder="password"
-            className="w-full mt-3 p-3 border rounded-xl bg-gray-100"
-            id="password"
-          />
-        </div>
+      {notification.message && (
+        <Alert
+          message={notification.message}
+          kind={notification.kind}
+          setNotification={setNotification}
+        />
+      )}
+      <form onSubmit={handleLogin} className="my-10 bg-white shadow px-10 py-5">
+        <Input
+          id="email"
+          kind="email"
+          title="Email"
+          value={credentials.email}
+          placeholder="example@domail.com"
+          onInput={handleInputChange}
+          error={errorForm.email}
+        />
+        <Input
+          id="password"
+          kind="password"
+          title="Password"
+          value={credentials.password}
+          placeholder="***"
+          onInput={handleInputChange}
+          error={errorForm.password}
+        />
         <input
           type="submit"
           value="Login"
