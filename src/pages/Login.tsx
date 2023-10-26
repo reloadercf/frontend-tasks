@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
 import Alert from '../components/Alert';
 import Input from '../components/Input';
@@ -12,6 +13,8 @@ const loginSchema = z.object({
 });
 
 export const Login = () => {
+  const [cookies, setCookie] = useCookies(['session']);
+
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
@@ -40,9 +43,18 @@ export const Login = () => {
     e.preventDefault();
     const isValidForm = loginSchema.safeParse(credentials);
     if (isValidForm.success) {
+      const dateExpire = new Date();
+      dateExpire.setDate(dateExpire.getDate() + 1);
       try {
         const { data } = await connect.user.post('/login', credentials);
-        console.log(data);
+        setCookie('session', data.token, {
+          sameSite: true,
+          expires: dateExpire,
+        });
+        setNotification({
+          message: `Welcome ${data.email}`,
+          kind: 'success',
+        });
       } catch (err) {
         setNotification({
           message: err.response.data.msj,
