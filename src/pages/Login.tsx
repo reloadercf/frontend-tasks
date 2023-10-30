@@ -7,6 +7,8 @@ import Alert from '../components/Alert';
 import Input from '../components/Input';
 import connect from '../lib/connectAxios';
 
+import useAuth from '../hooks/useAuth';
+
 const loginSchema = z.object({
   email: z.string().email().min(5, { message: 'Complete your email' }),
   password: z.string().min(5, { message: 'Complete your password' }),
@@ -24,6 +26,8 @@ export const Login = () => {
     kind: null,
   });
   const [errorForm, setError] = useState({});
+
+  const { setAuth } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -51,6 +55,9 @@ export const Login = () => {
           sameSite: true,
           expires: dateExpire,
         });
+
+        setAuth(data);
+
         setNotification({
           message: `Welcome ${data.email}`,
           kind: 'success',

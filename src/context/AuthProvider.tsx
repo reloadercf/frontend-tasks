@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext } from 'react';
+import React, { ReactNode, createContext, useState } from 'react';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -7,7 +7,13 @@ interface AuthProviderProps {
 const AuthContext = createContext();
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
+  const [auth, setAuth] = useState({});
+
+  return (
+    <AuthContext.Provider value={{ auth, setAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export { AuthProvider };
