@@ -11,6 +11,7 @@ const AuthContext = createContext();
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [auth, setAuth] = useState({});
+  const [load, setLoad] = useState(true);
   const [cookies] = useCookies(['session']);
 
   useEffect(() => {
@@ -29,6 +30,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       getProfile();
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoad(false);
     }
   }, []);
   return (

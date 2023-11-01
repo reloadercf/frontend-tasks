@@ -8,6 +8,8 @@ import { NewPassword } from './pages/NewPassword';
 import { AuthLayout } from './layouts/AuthLayout';
 import { ForgetPassword } from './pages/ForgetPassword';
 import { ConfirmAccount } from './pages/ConfirmAccount';
+import { ProtectedRoute } from './layouts/ProtectedRoute';
+import { Projects } from './pages/Projects';
 
 function App() {
   return (
@@ -20,6 +22,9 @@ function App() {
             <Route path="confirm/:id" element={<ConfirmAccount />} />
             <Route path="forget-password" element={<ForgetPassword />} />
             <Route path="forget-password/:token" element={<NewPassword />} />
+          </Route>
+          <Route path="/projects" element={<ProtectedRoute />}>
+            <Route index element={<Projects />} />
           </Route>
         </Routes>
       </AuthProvider>
