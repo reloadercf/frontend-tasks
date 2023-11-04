@@ -1,5 +1,6 @@
 import { useCookies } from 'react-cookie';
 import React, { ReactNode, createContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import connect from '../lib/connectAxios';
 
@@ -11,31 +12,37 @@ const AuthContext = createContext();
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [auth, setAuth] = useState({});
-  const [load, setLoad] = useState(true);
+  const [isLoad, setLoad] = useState(true);
+
   const [cookies] = useCookies(['session']);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!cookies.session) return;
-    const config = {
-      headers: {
-        'Content-type': 'application/json',
-        Authorization: `Bearer ${cookies.session}`,
-      },
-    };
-    try {
-      const getProfile = async () => {
+    if (!cookies.session) {
+      setLoad(false);
+      return;
+    }
+    const getAuth = async () => {
+      const config = {
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${cookies.session}`,
+        },
+      };
+      try {
         const { data } = await connect.user('/profile ', config);
         setAuth(data);
-      };
-      getProfile();
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoad(false);
-    }
+        setLoad(false);
+        navigate('projects');
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getAuth();
   }, []);
   return (
-    <AuthContext.Provider value={{ auth, setAuth }}>
+    <AuthContext.Provider value={{ auth, setAuth, isLoad }}>
       {children}
     </AuthContext.Provider>
   );

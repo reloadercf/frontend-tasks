@@ -54,6 +54,7 @@ export const Login = () => {
         setCookie('session', data.token, {
           sameSite: true,
           expires: dateExpire,
+          path: '/',
         });
 
         setAuth(data);
