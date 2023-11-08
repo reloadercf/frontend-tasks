@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 import Alert from '../components/Alert';
@@ -28,6 +28,8 @@ export const Login = () => {
   const [errorForm, setError] = useState({});
 
   const { setAuth } = useAuth();
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,11 +60,11 @@ export const Login = () => {
         });
 
         setAuth(data);
-
         setNotification({
           message: `Welcome ${data.email}`,
           kind: 'success',
         });
+        navigate('projects');
       } catch (err) {
         setNotification({
           message: err.response.data.msj,
